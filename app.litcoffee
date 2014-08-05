@@ -78,7 +78,7 @@ Give "choose from the list"-type questions unique names so that the "other" opti
 		console.log data.responses
 
 
-
+We call the Typeform API for our configured form:
 
 	rest.get "https://api.typeform.com/v0/form/#{form}?key=#{api_key}&completed=true", (data, response) ->
 		processData(parseData(data))
