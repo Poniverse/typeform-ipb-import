@@ -1,0 +1,28 @@
+{
+  "name": "typeform-ipb-import",
+  "version": "1.0.0",
+  "description": "A script to grab form entries from Typeform and post them into an IP.Board forum.",
+  "main": "app.js",
+  "dependencies": {
+    "node-rest-client": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Poniverse/typeform-ipb-import"
+  },
+  "keywords": [
+    "typeform",
+    "ip.board",
+    "import"
+  ],
+  "author": "Peter Deltchev <peter@deltchev.com> (http://peter.deltchev.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Poniverse/typeform-ipb-import/issues"
+  },
+  "homepage": "https://github.com/Poniverse/typeform-ipb-import"
+}
