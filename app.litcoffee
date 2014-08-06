@@ -31,58 +31,57 @@ The action begins here!
 	rest = new Client
 
 
-This function parses the raw data, separating the questions and responses from it.
-For performance reasons, the questions are not "merged" with the responses here, as many responses might be skipped in processing.
-
-	parseData = (rawJson, response) ->
-		json = JSON.parse(rawJson)
-		questions = json.questions
-		responses = json.responses
-
-Data is returned as a single object:
-
-		questions: questions
-		responses: responses
-
-
+	class FormData
 
 Here, we...
 
-	processData = (data) ->
-
+		processData: () ->
 ...give "choose from the list"-type questions unique names so that the "other" option doesn't overwrite the chosen one...
 
-		data.questions = data.questions.map (question) ->
-			if question.id.match /list_\d+_(choice|other)/
-				type = question.id.match /choice|other/g
-				question.question = "#{question.question} (#{type[0]})"
-			question
+			@questions = @questions.map (question) ->
+				if question.id.match /list_\d+_(choice|other)/
+					type = question.id.match /choice|other/g
+					question.question = "#{question.question} (#{type[0]})"
+				question
 
 ...skip responses we've already dealt with...
 
-		data.responses = data.responses.filter (response) ->
-			response.id > latest_id
+			@responses = @responses.filter (response) ->
+				response.id > latest_id
 
-...leave data in a form that's ready to work with...
+...and leave data in a form that's ready to work with.
 
-		data.responses = data.responses.map (response) ->
-			newResponse =
-				id: response.id
-				completed: response.completed
-				metadata: response.metadata
-				answers: {}
+			@responses = @responses.map (response) =>
+				newResponse =
+					id: response.id
+					completed: response.completed
+					metadata: response.metadata
+					answers: {}
 
-			for question in data.questions
-				newResponse.answers[question.question] = response.answers[question.id]
+				for question in @questions
+					newResponse.answers[question.question] = response.answers[question.id]
 
-			newResponse
+				newResponse
+			@
 
-...and echo the result!
 
-		console.log data.responses
+This function parses the raw data, separating the questions and responses from it. For performance reasons, the questions are not "merged" with the responses here, as many responses might be skipped in processing.
+
+		addRawJson: (rawJson) ->
+			json = JSON.parse(rawJson)
+			@questions = json.questions
+			@responses = json.responses
+			@processData()
+			@
+
+		echo: () ->
+			console.log @questions
+			console.log @responses
 
 
 We call the Typeform API for our configured form:
 
 	rest.get "https://api.typeform.com/v0/form/#{form}?key=#{api_key}&completed=true", (data, response) ->
-		processData(parseData(data))
+		applications = new FormData()
+			.addRawJson(data)
+			.echo()
