@@ -50,6 +50,14 @@ Here, we...
 
 	processData = (data) ->
 
+...give "choose from the list"-type questions unique names so that the "other" option doesn't overwrite the chosen one...
+
+		data.questions = data.questions.map (question) ->
+			if question.id.match /list_\d+_(choice|other)/
+				type = question.id.match /choice|other/g
+				question.question = "#{question.question} (#{type[0]})"
+			question
+
 ...skip responses we've already dealt with...
 
 		data.responses = data.responses.filter (response) ->
@@ -64,13 +72,9 @@ Here, we...
 				metadata: response.metadata
 				answers: {}
 
-Give "choose from the list"-type questions unique names so that the "other" option doesn't overwrite the chosen one.
-
 			for question in data.questions
-				if question.id.match /list_\d+_[a-z]+/
-					type = question.id.match /choice|other/g
-					question.question = "#{question.question} (#{type[0]})"
 				newResponse.answers[question.question] = response.answers[question.id]
+
 			newResponse
 
 ...and echo the result!
