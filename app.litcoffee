@@ -1,6 +1,7 @@
 This script places data from Typeform in an IP.Board forum, using the relevant API's.
 
-	require('coffee-script/register');
+	fs = require 'fs'
+	require 'coffee-script/register'
 	config = require './config'
 
 
@@ -33,6 +34,16 @@ IpsClient is an abstraction for interacting with the IP.Board API.
 
 	class FormData
 
+		updateId: (id) ->
+			fs.writeFileSync './latest_id', id
+
+
+		latestId: () ->
+			@updateId config.typeform.latest_id unless fs.existsSync './latest_id'
+
+			parseInt fs.readFileSync('./latest_id').toString()
+
+
 Here, we...
 
 		processData: () ->
@@ -46,14 +57,14 @@ Here, we...
 
 ...skip responses we've already dealt with...
 
-			@responses = @responses.filter (response) ->
-				response.id > config.typeform.latest_id
+			@responses = @responses.filter (response) =>
+				response.id > (Math.max config.typeform.latest_id, @latestId())
 
 ...and leave data in a form that's ready to work with.
 
 			@responses = @responses.map (response) =>
 				newResponse =
-					id: response.id
+					id: parseInt response.id
 					completed: response.completed
 					metadata: response.metadata
 					answers: {}
@@ -83,7 +94,6 @@ Sends data over to IP.Board!
 
 		export: () ->
 			topics = (@generateTopic response for response in @responses)
-			console.log topics
 			@postTopic topic for topic in topics
 
 
@@ -96,11 +106,12 @@ Sends data over to IP.Board!
 				post += """
 				[b][u]#{question}[/u][/b]
 				#{answer}
-				
+
 
 				"""
 
 			return {
+				response_id: response.id
 				title: title
 				post: post
 			}
@@ -115,6 +126,8 @@ Sends data over to IP.Board!
 				topic_title: topic.title
 				post_content: topic.post
 
+			@updateId topic.response_id
+
 
 
 
@@ -125,5 +138,5 @@ We call the Typeform API for our configured form:
 	rest = new restClient.Client
 	rest.get "https://api.typeform.com/v0/form/#{config.typeform.form}?key=#{config.typeform.api_key}&completed=true", (data, response) ->
 		applications = new FormData()
-			.import(data)
+			.import data
 			.export()

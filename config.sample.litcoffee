@@ -15,6 +15,10 @@ Typeform Configuration
         # This is the ID number of the last entry we imported. ID's are assigned
         # sequentially by Typeform, so they're a reliable way to skip ahead to
         # the new stuff. Use 0 to process all entries!
+        #
+        # NOTE: This is only used the first time the script is run! After that,
+        #       the ID of the last entry imported is stored in the "latest_id"
+        #       file created in the script's root.
 
         latest_id: 0
 
