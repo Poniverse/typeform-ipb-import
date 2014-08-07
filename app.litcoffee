@@ -43,6 +43,26 @@ IpsClient is an abstraction for interacting with the IP.Board API.
 
 			parseInt fs.readFileSync('./latest_id').toString()
 
+		escapeRegExp: (string) ->
+  		string.replace /([.*+?^${}()|\[\]\/\\])/g, "\\$1"
+
+
+		# Parses a profile URL to determine a user's display name.
+		getDisplayNameFromUrl: (url) ->
+			expression = new RegExp "(?!{@escapeRegExp @escapeRegExp config.ipb.url}\\/user\\/)(\\d+)(?=-)", 'g'
+			id = parseInt url.match(expression)[0]
+
+			user = ips.call 'fetchMember',
+				search_type: 'member_id',
+				search_string: id
+
+			if user?
+				console.log user['members_display_name']
+			else
+				console.log "No name for ##{id}!"
+
+
+
 
 Here, we...
 
@@ -53,13 +73,18 @@ Here, we...
 				response.id > (Math.max config.typeform.latest_id, @latestId())
 
 
-			# ...make yes/no answers more human-friendly...
-			@responses = @responses.map (response) ->
+			@responses = @responses.map (response) =>
 				for question_id, answer of response.answers
+
+					# ...make yes/no answers more human-friendly...
 					if question_id.match /terms_\d+/
 						if answer == '1'
 							response.answers[question_id] = 'I accept!'
 						else answer = 'I don\'t accept.'
+
+					# ...add the user's display name...
+					else if question_id is 'textfield_1420525'
+						response.displayName = @getDisplayNameFromUrl answer
 				response
 
 
