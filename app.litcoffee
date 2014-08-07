@@ -1,34 +1,34 @@
 This script places data from Typeform in an IP.Board forum, using the relevant API's.
 
-Typeform Configuration
-----------------------
-
-	api_key = ''
-	form = ''
-
-This is the ID number of the last entry we imported. ID's are assigned sequentially by Typeform, so they're a reliable way to skip ahead to the new stuff.
-
-	latest_id = 0
+	require('coffee-script/register');
+	config = require './config'
 
 
-IP.Board Configuration
-----------------------
-
-API Settings
-
-	ipb_api_key = ''
-	ipb_module = 'ipb'
-
-URL of the IP.Board installation (no trailing slash)
-
-	ipb_url = ''
-
+Main Code
+=========
 
 The action begins here!
 
-	Client = require 'node-rest-client'
-		.Client
-	rest = new Client
+	restClient = require 'node-rest-client'
+	xmlrpc = require 'xmlrpc'
+
+
+IpsClient is an abstraction for interacting with the IP.Board API.
+
+	class IpsClient
+		constructor: (@url, @module, @api_key) ->
+			@client = xmlrpc.createClient "#{config.ipb.url}/interface/board/index.php"
+
+		call: (method, data) ->
+			# merge in the relevant data
+			data.api_module = @module
+			data.api_key = @api_key
+
+			@client.methodCall method, [data], (error, value) ->
+				console.log value
+
+
+	ips = new IpsClient config.ipb.url, config.ipb.module, config.ipb.api_key
 
 
 	class FormData
@@ -47,7 +47,7 @@ Here, we...
 ...skip responses we've already dealt with...
 
 			@responses = @responses.filter (response) ->
-				response.id > latest_id
+				response.id > config.typeform.latest_id
 
 ...and leave data in a form that's ready to work with.
 
@@ -67,21 +67,63 @@ Here, we...
 
 This function parses the raw data, separating the questions and responses from it. For performance reasons, the questions are not "merged" with the responses here, as many responses might be skipped in processing.
 
-		addRawJson: (rawJson) ->
+		import: (rawJson) ->
 			json = JSON.parse(rawJson)
 			@questions = json.questions
 			@responses = json.responses
 			@processData()
 			# the object is implicitly returned by @processData
 
+Prints all responses to output. Useful for debugging.
+
 		echo: () ->
-			console.log @questions
 			console.log @responses
+
+Sends data over to IP.Board!
+
+		export: () ->
+			topics = (@generateTopic response for response in @responses)
+			console.log topics
+			@postTopic topic for topic in topics
+
+
+		generateTopic: (response) ->
+			console.log response
+			title = "New moderator application!"
+			post = ''
+
+			for question, answer of response.answers
+				post += """
+				[b][u]#{question}[/u][/b]
+				#{answer}
+				
+
+				"""
+
+			return {
+				title: title
+				post: post
+			}
+
+
+
+		postTopic: (topic) ->
+			ips.call 'postTopic',
+				member_field: 'member_id'
+				member_key: config.ipb.user_id
+				forum_id: config.ipb.forum_id
+				topic_title: topic.title
+				post_content: topic.post
+
+
+
+
 
 
 We call the Typeform API for our configured form:
 
-	rest.get "https://api.typeform.com/v0/form/#{form}?key=#{api_key}&completed=true", (data, response) ->
+	rest = new restClient.Client
+	rest.get "https://api.typeform.com/v0/form/#{config.typeform.form}?key=#{config.typeform.api_key}&completed=true", (data, response) ->
 		applications = new FormData()
-			.addRawJson(data)
-			.echo()
+			.import(data)
+			.export()

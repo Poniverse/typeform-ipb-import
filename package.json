@@ -4,7 +4,9 @@
   "description": "A script to grab form entries from Typeform and post them into an IP.Board forum.",
   "main": "app.js",
   "dependencies": {
-    "node-rest-client": "^1.0.0"
+    "coffee-script": "^1.7.1",
+    "node-rest-client": "^1.0.0",
+    "xmlrpc": "^1.2.0"
   },
   "devDependencies": {},
   "scripts": {
