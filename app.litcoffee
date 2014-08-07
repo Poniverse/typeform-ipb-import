@@ -62,7 +62,7 @@ Here, we...
 					newResponse.answers[question.question] = response.answers[question.id]
 
 				newResponse
-			@
+			@ # return the object, for the sake of method chaining
 
 
 This function parses the raw data, separating the questions and responses from it. For performance reasons, the questions are not "merged" with the responses here, as many responses might be skipped in processing.
@@ -72,7 +72,7 @@ This function parses the raw data, separating the questions and responses from i
 			@questions = json.questions
 			@responses = json.responses
 			@processData()
-			@
+			# the object is implicitly returned by @processData
 
 		echo: () ->
 			console.log @questions
