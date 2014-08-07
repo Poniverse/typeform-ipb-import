@@ -47,21 +47,33 @@ IpsClient is an abstraction for interacting with the IP.Board API.
 Here, we...
 
 		processData: () ->
-...give "choose from the list"-type questions unique names so that the "other" option doesn't overwrite the chosen one...
 
+			# ...skip responses we've already dealt with...
+			@responses = @responses.filter (response) =>
+				response.id > (Math.max config.typeform.latest_id, @latestId())
+
+
+			# ...make yes/no answers more human-friendly...
+			@responses = @responses.map (response) ->
+				for question_id, answer of response.answers
+					if question_id.match /terms_\d+/
+						if answer == '1'
+							response.answers[question_id] = 'I accept!'
+						else answer = 'I don\'t accept.'
+				response
+
+
+			# ...give "choose from the list"-type questions unique names so that the
+			# "other" option doesn't overwrite the chosen one...
 			@questions = @questions.map (question) ->
 				if question.id.match /list_\d+_(choice|other)/
 					type = question.id.match /choice|other/g
 					question.question = "#{question.question} (#{type[0]})"
 				question
 
-...skip responses we've already dealt with...
 
-			@responses = @responses.filter (response) =>
-				response.id > (Math.max config.typeform.latest_id, @latestId())
 
-...and leave data in a form that's ready to work with.
-
+			# ...and leave data in a form that's ready to work with.
 			@responses = @responses.map (response) =>
 				newResponse =
 					id: parseInt response.id
@@ -98,7 +110,6 @@ Sends data over to IP.Board!
 
 
 		generateTopic: (response) ->
-			console.log response
 			title = "New moderator application!"
 			post = ''
 
