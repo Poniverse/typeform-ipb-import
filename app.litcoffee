@@ -20,31 +20,28 @@ IpsClient is an abstraction for interacting with the IP.Board API.
 		constructor: (@url, @module, @api_key) ->
 			@client = xmlrpc.createClient "#{config.ipb.url}/interface/board/index.php"
 
-		call: (method, data) ->
+		call: (method, data, callback) ->
 			# merge in the relevant data
 			data.api_module = @module
 			data.api_key = @api_key
 
-			@client.methodCall method, [data], (error, value) ->
-				console.log value
+			@client.methodCall method, [data], callback = (error, data) ->
+				console.log 'IPS call finished!'
 
 
 	ips = new IpsClient config.ipb.url, config.ipb.module, config.ipb.api_key
 
 
-	class FormData
 
-		updateId: (id) ->
-			fs.writeFileSync './latest_id', id
+This class represents a single application.
 
+	class Application
+		constructor: (@responseJson) ->
+			@data = @responseJson
 
-		latestId: () ->
-			@updateId config.typeform.latest_id unless fs.existsSync './latest_id'
-
-			parseInt fs.readFileSync('./latest_id').toString()
 
 		escapeRegExp: (string) ->
-  		string.replace /([.*+?^${}()|\[\]\/\\])/g, "\\$1"
+			string.replace /([.*+?^${}()|\[\]\/\\])/g, "\\$1"
 
 
 		# Parses a profile URL to determine a user's display name.
@@ -60,6 +57,60 @@ IpsClient is an abstraction for interacting with the IP.Board API.
 				console.log user['members_display_name']
 			else
 				console.log "No name for ##{id}!"
+
+
+		# Sends data over to IP.Board!
+		export: () ->
+			topics = (@generateTopic response for response in @responses)
+			@postTopic topic for topic in topics
+
+
+		generateTopic: (response) ->
+			title = "New moderator application!"
+			post = ''
+
+			for question, answer of response.answers
+				post += """
+				[b][u]#{question}[/u][/b]
+				#{answer}
+
+
+				"""
+
+			return {
+				response_id: response.id
+				title: title
+				post: post
+			}
+
+
+
+		postTopic: (topic) ->
+			@addTitle () ->
+				ips.call 'postTopic',
+					member_field: 'member_id'
+					member_key: config.ipb.user_id
+					forum_id: config.ipb.forum_id
+					topic_title: topic.title
+					post_content: topic.post
+
+				@updateId topic.response_id
+
+
+
+
+
+
+	class FormData
+
+		updateId: (id) ->
+			fs.writeFileSync './latest_id', id
+
+
+		latestId: () ->
+			@updateId config.typeform.latest_id unless fs.existsSync './latest_id'
+
+			parseInt fs.readFileSync('./latest_id').toString()
 
 
 
@@ -126,45 +177,6 @@ Prints all responses to output. Useful for debugging.
 
 		echo: () ->
 			console.log @responses
-
-Sends data over to IP.Board!
-
-		export: () ->
-			topics = (@generateTopic response for response in @responses)
-			@postTopic topic for topic in topics
-
-
-		generateTopic: (response) ->
-			title = "New moderator application!"
-			post = ''
-
-			for question, answer of response.answers
-				post += """
-				[b][u]#{question}[/u][/b]
-				#{answer}
-
-
-				"""
-
-			return {
-				response_id: response.id
-				title: title
-				post: post
-			}
-
-
-
-		postTopic: (topic) ->
-			ips.call 'postTopic',
-				member_field: 'member_id'
-				member_key: config.ipb.user_id
-				forum_id: config.ipb.forum_id
-				topic_title: topic.title
-				post_content: topic.post
-
-			@updateId topic.response_id
-
-
 
 
 
