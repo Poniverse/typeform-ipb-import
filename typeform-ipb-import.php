@@ -13,7 +13,8 @@ $ips = new IPS($config['ipb']['url'], $config['ipb']['module'], $config['ipb']['
 
 $formData = loadFormResponses();
 $formData = parseFormResponses($formData);
-print_r($formData);
+postApplications($formData);
+//print_r($formData);
 
 
 function getDisplayNameFromUrl($url) {
@@ -29,7 +30,7 @@ function getDisplayNameFromUrl($url) {
 			'search_string' => $userId
 		]);
 		$displayName = $user['members_display_name'];
-		
+
 	} else {
 		$displayName = ':: MAILMARE IS CONFUSED ::';
 	}
@@ -56,6 +57,7 @@ function loadFormResponses() {
 
 
 function parseFormResponses($formData) {
+	global $config;
 
 	// Give "choose from the list"-type questions unique names so
 	// that the "other" option doesn't overwrite the chosen one
@@ -74,7 +76,7 @@ function parseFormResponses($formData) {
 
 
 	// remove responses we've already processed
-	$lastResponseId = 1000;
+	$lastResponseId = $config['typeform']['latestId'];
 	$responses = array_filter($formData['responses'], function($response) use ($lastResponseId) {
 		return $response['id'] > $lastResponseId;
 	});
@@ -117,4 +119,22 @@ function parseFormResponses($formData) {
 		'questions' => $questions,
 		'responses' => $responses
 	];
+}
+
+
+
+
+function postApplications($formData) {
+	global $config;
+	global $ips;
+
+	$topic = new Topic();
+	$topic->setForumId($config['ipb']['forumId']);
+	$topic->setUserId($config['ipb']['userId']);
+	$topic->setIpsApi($ips);
+
+	foreach ($formData['responses'] as $response) {
+		$topic->setFormResponse($response);
+		$topic->post();
+	}
 }
