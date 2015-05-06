@@ -1,0 +1,138 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "e38b5f57759049a820cbf944063d050f",
+    "packages": [
+        {
+            "name": "lstrojny/fxmlrpc",
+            "version": "0.9.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lstrojny/fxmlrpc.git",
+                "reference": "2f3acc8d4111e8753e646149bdfad0337175bd12"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lstrojny/fxmlrpc/zipball/2f3acc8d4111e8753e646149bdfad0337175bd12",
+                "reference": "2f3acc8d4111e8753e646149bdfad0337175bd12",
+                "shasum": ""
+            },
+            "require-dev": {
+                "amphp/artax": "*@dev",
+                "ext-curl": "*",
+                "guzzle/guzzle": "*",
+                "internations/kodierungsregelwerksammlung": "dev-master",
+                "kriswallsmith/buzz": "*",
+                "lstrojny/hmmmath": "*",
+                "monolog/monolog": "*",
+                "php": ">=5.4.0",
+                "phpunit/phpunit": "~4",
+                "psr/log": "*",
+                "symfony/process": "~2",
+                "zendframework/zend-http": "~2",
+                "zendframework/zend-log": "~2",
+                "zendframework/zendframework1": "~1"
+            },
+            "suggest": {
+                "ext-http": "Use ext/http as HTTP client",
+                "guzzle/guzzle": "To integrate Guzzle as HTTP client",
+                "kriswallsmith/buzz": "To integrate Buzz as HTTP client",
+                "monolog/monolog": "To integrate monolog as logger",
+                "zendframework/zend-http": "To use ZF2 Zend\\Http\\Client as HTTP client",
+                "zendframework/zend-log": "To use ZF2 Zend\\Log\\Logger as a logger",
+                "zendframework/zendframework1": "To use ZF1 Zend_Http_Client as HTTP client"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "fXmlRpc": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lars Strojny",
+                    "email": "lstrojny@php.net",
+                    "homepage": "http://usrportage.de"
+                }
+            ],
+            "description": "Fast and tiny XML/RPC client with bridges for various HTTP clients",
+            "keywords": [
+                "api",
+                "performance",
+                "rpc",
+                "xml",
+                "xmlrpc"
+            ],
+            "time": "2015-01-28 12:24:34"
+        },
+        {
+            "name": "positivezero/rest",
+            "version": "v0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/positivezero/rest.git",
+                "reference": "a67316fe72dfb68b63bcdb260bc5030ccbda5418"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/positivezero/rest/zipball/a67316fe72dfb68b63bcdb260bc5030ccbda5418",
+                "reference": "a67316fe72dfb68b63bcdb260bc5030ccbda5418",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6-dev"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD 3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Vojtěch Kijenský",
+                    "homepage": "http://www.positivezero.co.uk"
+                },
+                {
+                    "name": "Travis Dent",
+                    "email": "tcdent@gmail.com",
+                    "homepage": "https://github.com/tcdent/php-restclient"
+                }
+            ],
+            "description": "The REST PHP client",
+            "homepage": "https://github.com/positivezero/rest",
+            "keywords": [
+                "client",
+                "library",
+                "php",
+                "rest"
+            ],
+            "time": "2013-11-01 09:22:02"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

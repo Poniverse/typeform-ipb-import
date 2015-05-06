@@ -1,0 +1,13 @@
+{
+    "name": "poniverse/typeform-ipb-import",
+    "require": {
+        "positivezero/rest": "^0.6.0",
+        "lstrojny/fxmlrpc": "^0.9.4"
+    },
+    "authors": [
+        {
+            "name": "Peter Deltchev",
+            "email": "peter@deltchev.com"
+        }
+    ]
+}
