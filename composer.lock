@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e38b5f57759049a820cbf944063d050f",
+    "hash": "e674120329896eb95f0d7f6a529678a5",
     "packages": [
         {
             "name": "lstrojny/fxmlrpc",
