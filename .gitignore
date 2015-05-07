@@ -1,7 +1,3 @@
-node_modules
-config.litcoffee
-latest_id
-
 /vendor/
 config.php
 ids_processed

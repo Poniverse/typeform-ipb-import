@@ -16,7 +16,7 @@ return [
 		// the new stuff. Use 0 to process all entries!
 		//
 		// NOTE: This is only used the first time the script is run! After that,
-		//       the ID of the last entry imported is stored in the "latest_id"
+		//       the ID of the last entry imported is stored in the "ids_processed"
 		//       file created in the script's root.
 		'latestId'  => 0
 	],

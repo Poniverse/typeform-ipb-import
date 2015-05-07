@@ -1,5 +1,7 @@
 {
     "name": "poniverse/typeform-ipb-import",
+    "description": "A script to grab form entries from Typeform and post them into an IP.Board forum.",
+    "license": "MIT",
     "require": {
         "positivezero/rest": "^0.6.0",
         "lstrojny/fxmlrpc": "^0.9.4"
