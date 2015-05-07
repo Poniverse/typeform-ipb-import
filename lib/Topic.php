@@ -25,9 +25,9 @@ class Topic {
 		// Add metadata
 		$post .=
 <<<EOF
-Application started at: {$this->response['metadata']['date_land']}
-Application submitted at: {$this->response['metadata']['date_submit']}
-Applied from: {$this->response['metadata']['referer']}
+[b]Application started at:[/b] {$this->response['metadata']['date_land']}
+[b]Application submitted at:[/b] {$this->response['metadata']['date_submit']}
+[b]Applied from:[/b] {$this->response['metadata']['referer']}
 
 [hr]
 

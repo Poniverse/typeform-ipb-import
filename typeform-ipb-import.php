@@ -1,3 +1,4 @@
+#!/usr/bin/env/php
 <?php
 
 require 'vendor/autoload.php';
@@ -7,16 +8,23 @@ require 'lib/Topic.php';
 use Positivezero\RestClient;
 
 $config = require 'config.php';
-
 $ips = new IPS($config['ipb']['url'], $config['ipb']['module'], $config['ipb']['apiKey']);
 
+echo 'Importing form responses...'.PHP_EOL;
 
 $formData = loadFormResponses();
 $formData = parseFormResponses($formData);
 postApplications($formData);
-//print_r($formData);
 
 
+/**
+ * Given an IP.Board profile URL, this method attempts to return the user's
+ * display name by parsing the member ID out of it and asking the IPB forum's
+ * API for their details.
+ *
+ * @param $url
+ * @return string
+ */
 function getDisplayNameFromUrl($url) {
 	global $ips;
 
@@ -39,6 +47,12 @@ function getDisplayNameFromUrl($url) {
 }
 
 
+/**
+ * Load's the form's responses from Typeform's API, returning the
+ * JSON data as an associate array.
+ *
+ * @return array
+ */
 function loadFormResponses() {
 	global $config;
 
@@ -54,17 +68,21 @@ function loadFormResponses() {
 }
 
 
-
-
+/**
+ * Processes the data from Typeform into a format suitable for display.
+ *
+ * @param array $formData Typeform data from loadFormResponses()
+ * @return array
+ */
 function parseFormResponses($formData) {
 	global $config;
 
 	// Give "choose from the list"-type questions unique names so
 	// that the "other" option doesn't overwrite the chosen one
 	$questions = array_map(function($question) {
-		if (preg_match('/list_\d+(choice|other)/', $question['id'])) {
+		if (preg_match('/list_\d+_(choice|other)/', $question['id'])) {
 			$matches = [];
-			preg_match('/choice|other/g', $question['id'], $matches);
+			preg_match('/choice|other/', $question['id'], $matches);
 			$type = $matches[0];
 			$question['question'] = "{$question['question']} ({$type})";
 
@@ -76,7 +94,7 @@ function parseFormResponses($formData) {
 
 
 	// remove responses we've already processed
-	$lastResponseId = $config['typeform']['latestId'];
+	$lastResponseId = getLatestId();
 	$responses = array_filter($formData['responses'], function($response) use ($lastResponseId) {
 		return $response['id'] > $lastResponseId;
 	});
@@ -95,6 +113,7 @@ function parseFormResponses($formData) {
 
 			// add the user's display name for the first question
 			} elseif ($questionId === 'textfield_1420525') {
+				echo "Retrieving display name for response {$response['id']}...".PHP_EOL;
 				$response['displayName'] = getDisplayNameFromUrl($answer);
 			}
 		}
@@ -122,8 +141,11 @@ function parseFormResponses($formData) {
 }
 
 
-
-
+/**
+ * Formatted form responses are posted to the IP.Board forum.
+ *
+ * @param array $formData
+ */
 function postApplications($formData) {
 	global $config;
 	global $ips;
@@ -134,7 +156,45 @@ function postApplications($formData) {
 	$topic->setIpsApi($ips);
 
 	foreach ($formData['responses'] as $response) {
+		echo "Posting response {$response['id']}..." . PHP_EOL;
 		$topic->setFormResponse($response);
 		$topic->post();
+		updateLatestId($response['id']);
 	}
+}
+
+
+/**
+ * Appends an ID to the ids_processed file.
+ *
+ * @param int $id
+ */
+function updateLatestId($id) {
+	$line = "$id\n";
+	file_put_contents('ids_processed', $line, FILE_APPEND | LOCK_EX);
+}
+
+/**
+ * Returns the last ID stored in the ids_processed file.
+ * If the ids_processed file doesn't exist, this returns the latest ID from
+ * the config file.
+ *
+ * @return int
+ */
+function getLatestId() {
+	global $config;
+	$log = file_get_contents('ids_processed');
+
+	if (!$log) {
+		$id = $config['typeform']['latestId'];
+	} else {
+		$ids = explode("\n", $log);
+
+		// The last element of the array is empty because it's a newline,
+		// so we use the second-last element.
+		end($ids);
+		$id = (int) prev($ids);
+	}
+
+	return $id;
 }
