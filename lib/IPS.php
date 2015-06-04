@@ -1,5 +1,7 @@
 <?php
 
+use fXmlRpc\Transport\StreamSocketTransport;
+
 class IPS {
 	/**
 	 * @var fXmlRpc\Client
@@ -20,7 +22,9 @@ class IPS {
 		$this->module = $apiModule;
 		$this->key = $apiKey;
 
-		$this->api = new fXmlRpc\Client( $this->url );
+		$transport = new StreamSocketTransport();
+		$transport->setHeader('User-Agent', 'Mailmare, starring as the Poniverse Typeform Poster!');
+		$this->api = new fXmlRpc\Client( $this->url, $transport );
 	}
 
 
