@@ -11,6 +11,9 @@ return [
 		// https://{{username}}.typeform.com/to/{{form}}
 		'form'      => '',
 
+		// The ID of the form's "profile URL" field. Should contain URL's to IP.Board profiles.
+		'profileUrlField' => '',
+
 		// This is the ID number of the last entry we imported. ID's are assigned
 		// sequentially by Typeform, so they're a reliable way to skip ahead to
 		// the new stuff. Use 0 to process all entries!

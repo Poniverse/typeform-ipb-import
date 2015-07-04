@@ -79,14 +79,14 @@ function parseFormResponses($formData) {
 
 	// Give "choose from the list"-type questions unique names so
 	// that the "other" option doesn't overwrite the chosen one
-	$questions = array_map(function($question) {
+	$questions = array_map(function($question) use ($config) {
 		if (preg_match('/list_\d+_(choice|other)/', $question['id'])) {
 			$matches = [];
 			preg_match('/choice|other/', $question['id'], $matches);
 			$type = $matches[0];
 			$question['question'] = "{$question['question']} ({$type})";
 
-		} elseif ($question['id'] === 'textfield_1420525') {
+		} elseif ($question['id'] === $config['typeform']['profileUrlField']) {
 			$question['question'] = 'Profile URL';
 		}
 		return $question;
@@ -101,7 +101,7 @@ function parseFormResponses($formData) {
 
 
 	// process the rest into a display-friendly format
-	$responses = array_map(function($response) use ($questions) {
+	$responses = array_map(function($response) use ($config, $questions) {
 		foreach ( $response['answers'] as $questionId => $answer ) {
 			// make yes/no answers more human-friendly
 			if (preg_match('/terms_\d/', $questionId)) {
@@ -112,7 +112,7 @@ function parseFormResponses($formData) {
 				}
 
 			// add the user's display name for the first question
-			} elseif ($questionId === 'textfield_1420525') {
+			} elseif ($questionId === $config[ 'typeform' ][ 'profileUrlField' ]) {
 				echo "Retrieving display name for response {$response['id']}...".PHP_EOL;
 				$response['displayName'] = getDisplayNameFromUrl($answer);
 			}
