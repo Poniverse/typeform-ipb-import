@@ -171,7 +171,7 @@ function postApplications($formData) {
  */
 function updateLatestId($id) {
 	$line = "$id\n";
-	file_put_contents('ids_processed', $line, FILE_APPEND | LOCK_EX);
+	file_put_contents(__DIR__ . '/ids_processed', $line, FILE_APPEND | LOCK_EX);
 }
 
 /**
@@ -183,7 +183,7 @@ function updateLatestId($id) {
  */
 function getLatestId() {
 	global $config;
-	$log = file_get_contents('ids_processed');
+	$log = file_get_contents(__DIR__ . '/ids_processed');
 
 	if (!$log) {
 		$id = $config['typeform']['latestId'];
